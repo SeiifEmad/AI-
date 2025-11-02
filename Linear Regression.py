@@ -1,48 +1,51 @@
-
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
+x_data, y_data = np.loadtxt('data.txt', delimiter=',', unpack=True)
 
-data = pd.read_csv('data.csv')
-X = data.iloc[:, 0].values
-y = data.iloc[:, 1].values
 
-X = (X - np.mean(X)) / np.std(X)
+m = 0.0
+b = 0.0
+learning_rate = 0.001
+epochs = 50  
+n = len(x_data)
 
-m = 0.0 
-b = 0.0  
-learning_rate = 0.01
-epochs = 100 
-
-n = len(X)
 
 for epoch in range(epochs):
     for i in range(n):
-        xi = X[i]
-        yi = y[i]
-        y_pred = m * xi + b
-        error = yi - y_pred
+        x_i = x_data[i]
+        y_i = y_data[i]
 
        
-        m += learning_rate * error * xi
-        b += learning_rate * error
+        y_pred = m * x_i + b
+        error = y_pred - y_i
 
-    
-    if (epoch + 1) % 10 == 0:
-        y_pred_all = m * X + b
-        loss = np.mean((y - y_pred_all) ** 2)
-        print(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}")
+      
+        dm = 2 * error * x_i
+        db = 2 * error
+
+      
+        m -= learning_rate * dm
+        b -= learning_rate * db
 
 
-print(f"\nFinal model: y = {m:.4f}x + {b:.4f}")
+y_pred = m * x_data + b
 
 
-plt.scatter(X, y, color='blue', label='Data Points')
-plt.plot(X, m * X + b, color='red', label='Fitted Line')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('Linear Regression using SGD (from scratch)')
+print(f"Final slope (m): {m:.4f}   salary increase per year (k$)")
+print(f"Final intercept (b): {b:.4f}   base salary (k$)")
+
+
+years = 21
+predicted_salary = m * years + b
+print(f"\nPredicted salary for {years} years of experience: ${predicted_salary:.2f}k/month")
+
+
+plt.scatter(x_data, y_data, color='blue', label='Actual Data')
+plt.plot(x_data, y_pred, color='red', linewidth=2, label='Regression Line')
+plt.xlabel('Years of Experience')
+plt.ylabel('Monthly Salary ( $)')
+plt.title('Linear Regression : Experience vs Salary')
 plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
 plt.show()
-
